@@ -1,6 +1,7 @@
+import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
-export const services = [
-    {
+
+export const services = [{
         title: "Technology Enthusiast",
         icon: 'https://csgeeek.github.io/web.png',
     },
@@ -9,15 +10,18 @@ export const services = [
         icon: 'https://csgeeek.github.io/web.png',
     },
     {
-        title: "Photographer",
+        title: "Mindfulness Advocate",
+        icon: 'https://csgeeek.github.io/web.png',
+    },
+    {
+        title: "AI Enthusiast",
         icon: 'https://csgeeek.github.io/web.png',
     },
 ];
 
-export const name = 'Nithin';
+export const name = 'PRASAD JUMARE';
 
-export const experiences = [
-    {
+export const experiences = [{
         'company': 'Inncircles Technologies',
         'role': 'Product Developer',
         'duration': 'April 2023 - Present',
@@ -42,6 +46,14 @@ export const experiences = [
         'url': 'https://www.att.com/',
     },
 ]
+
+
+
+export const socialLinks = [
+    { icon: < FaGithub / > , url: 'https://github.com/yourusername' },
+    { icon: < FaLinkedin / > , url: 'https://www.linkedin.com/in/yourusername' },
+    { icon: < FaTwitter / > , url: 'https://twitter.com/yourusername' },
+];
 
 
 

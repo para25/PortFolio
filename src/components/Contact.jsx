@@ -1,145 +1,137 @@
-import React, { useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect, useRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { EMAIL_JS_SERVICE_ID, EMAIL_JS_TEMPLATE_ID, EMAIL_JS_PUBLIC_KEY } from "../constants";
-import Footer from "./Footer";
-const Contact = () => {
-	const formRef = useRef();
-	const [form, setForm] = useState({
-		name: "",
-		email: "",
-		message: "",
-	});
+import Footer from './Footer';
 
+function ContactForm() {
+  const [submitting, setSubmitting] = useState(false);
+  const [showFooter, setShowFooter] = useState(false);
+  const observerRef = useRef();
 
-	const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowFooter(true);
+        } else {
+          setShowFooter(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-	const handleChange = (e) => {
-		const { target } = e;
-		const { name, value } = target;
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
 
-		setForm({
-			...form,
-			[name]: value,
-		});
-	};
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, []);
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		setLoading(true);
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
 
-		// cleaning the form data
-		const username = form.name.trim();
-		const user_email = form.email.trim();
-		const user_message = form.message.trim();
+    const formData = new FormData(event.target);
+    formData.append('access_key', '37dc50f5-156c-4734-a117-25f2786d8569');
 
-		if (username === '' || user_email === '' || user_message === '') {
-			setLoading(false);
-			toast.error("Please fill all the fields.", {
-				position: 'bottom-right',
-			});
-			return;
-		}
-		console.log(username,user_email,user_message)
+    try {
+      const object = Object.fromEntries(formData);
+      const json = JSON.stringify(object);
 
-		emailjs
-			.send(
-				EMAIL_JS_SERVICE_ID,
-				EMAIL_JS_TEMPLATE_ID,
-				{
-					from_name: username,
-					to_name: "Nithin Manda",
-					reply_to: user_email,
-					to_email: "goudnithin77@gmail.com",
-					message: user_message,
-				},
-				EMAIL_JS_PUBLIC_KEY
-			)
-			.then(
-				() => {
-					setLoading(false);
-					toast.success("Message sent successfully!", {
-						position: 'bottom-right',
-					});
-					setForm({
-						name: "",
-						email: "",
-						message: "",
-					});
-				},
-				(error) => {
-					setLoading(false);
-					console.error(error);
-					toast.error("Uh, oh! Something went wrong. Please try again later.", {
-						position: 'bottom-right',
-					});
-				}
-			);
-	};
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: json,
+      }).then((res) => res.json());
 
-	return (
+      if (res.success) {
+        console.log('Success', res);
+        toast.success('Form submitted successfully!');
+        event.target.reset(); // Reset the form
+      } else {
+        console.error('Error submitting form:', res);
+        toast.error('Error submitting form. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('Error submitting form. Please try again later.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-        <div className='relative z-0 bg-black w-screen h-screen mt-12'>   
-			<div className='text-white contact overflow-x-hidden pt-12 mt-8 ' id='contact'>
-				<div className='z-10 w-full sm:w-[650px] m-auto p-8 rounded-2xl' >
-					<p className='font-light'>REACH OUT TO ME</p>
-					<h2 className='text-5xl font-extrabold mt-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-pink-500'>Contact.</h2>
-					<form
-						ref={formRef}
-						onSubmit={handleSubmit}
-						className='mt-12 flex flex-col gap-8'
-					>
-						<label className='flex flex-col'>
-							<span className=' font-medium mb-4'>Your Name</span>
-							<input
-								type='text'
-								name='name'
-								value={form.name}
-								onChange={handleChange}
-								placeholder="Enter your name"
-								className='py-4 px-6 rounded-lg outline-none border-none font-medium bg-gray-900'
-								required
-							/>
-						</label>
-						<label className='flex flex-col'>
-							<span className=' font-medium mb-4'>Your email</span>
-							<input
-								type='email'
-								name='email'
-								value={form.email}
-								onChange={handleChange}
-								placeholder="Ex:abc@gmail.com"
-								className='py-4 px-6 rounded-lg  font-medium bg-gray-900'
-								required
-							/>
-						</label>
-						<label className='flex flex-col'>
-							<span className='font-medium mb-4'>Your Message</span>
-							<textarea
-								rows={7}
-								name='message'
-								value={form.message}
-								onChange={handleChange}
-								placeholder='Do you have anything to say?'
-								className='py-4 px-6 rounded-lg outline-none border-none font-medium bg-gray-900'
-								required
-							/>
-						</label>
-
-						<button
-							type='submit'
-							className='pt-3 px-8 rounded-xl outline-none w-fit font-bold shadow-md bg-gray-900'
-						>
-							{loading ? "Sending..." : "Send"}
-						</button>
-					</form>
-				</div>
-				<ToastContainer />
-			</div>
-		<Footer/>
+  return (
+    <div className='bg-black text-white overflow-x-hidden pt-28'>
+      <div className='contact overflow-x-hidden px-6 sm:px-16 pb-24' id='contact'>
+        <div className='max-w-3xl mx-auto p-8 bg-gray-900 rounded-2xl shadow-lg'>
+          <p className='text-center text-xl font-light'>REACH OUT TO ME</p>
+          <h2 className='text-5xl font-extrabold mt-2 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-pink-500'>
+            Contact.
+          </h2>
+          <form onSubmit={onSubmit} className='mt-12 flex flex-col gap-6'>
+            <label className='flex flex-col'>
+              <span className='font-medium mb-2'>Your Name</span>
+              <input
+                type='text'
+                name='name'
+                placeholder='Enter your name'
+                className='py-4 px-6 rounded-lg outline-none border-none font-medium bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500'
+                required
+              />
+            </label>
+            <label className='flex flex-col'>
+              <span className='font-medium mb-2'>Your Email</span>
+              <input
+                type='email'
+                name='email'
+                placeholder='Ex: abc@gmail.com'
+                className='py-4 px-6 rounded-lg outline-none border-none font-medium bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500'
+                required
+              />
+            </label>
+            <label className='flex flex-col'>
+              <span className='font-medium mb-2'>Your Message</span>
+              <textarea
+                rows={7}
+                name='message'
+                placeholder='Do you have anything to say?'
+                className='py-4 px-6 rounded-lg outline-none border-none font-medium bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500'
+                required
+              />
+            </label>
+            <button
+              type='submit'
+              className='py-3 px-8 rounded-xl outline-none font-bold shadow-md bg-pink-500 hover:bg-pink-600 transition-all duration-300 text-white'
+              disabled={submitting}
+            >
+              {submitting ? 'Submitting...' : 'Submit'}
+            </button>
+          </form>
+          <ToastContainer
+            position='top-center'
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
         </div>
-	);
-};
+      </div>
+      <div ref={observerRef} className='h-20'></div> {/* Observer reference */}
+      {showFooter && <Footer />}
+    </div>
+  );
+}
 
-export default Contact;
+export default ContactForm;

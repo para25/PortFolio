@@ -2,6 +2,7 @@ import React from 'react';
 
 const ButtonLink = ({ url, text, padding }) => {
   return (
+    // eslint-disable-next-line react/jsx-no-target-blank
     <a
       href={url}
       target='_blank'
