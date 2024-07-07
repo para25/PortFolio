@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 **Cloning an React project and running locally**
 
@@ -70,3 +71,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# PortFolio
+>>>>>>> ca850bb298c9ee740859c84e7d6fe445e327d2bb
